@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GrettingController {
 	
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	String loadInitGreeting() {
+		return "This is test Application for Openshift";
+	}
+	
 	@RequestMapping(value="/hello", method=RequestMethod.GET)
 	String sayHello(@RequestParam(defaultValue="Stranger") String name) {
 		return String.format("{\"greeting\":\"Hello %s\"}", name);
