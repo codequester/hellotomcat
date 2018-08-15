@@ -14,7 +14,7 @@ public class GrettingController {
 	}
 	
 	@RequestMapping(value="/hello", method=RequestMethod.GET)
-	String sayHello(@RequestParam(defaultValue="Stranger") String name) {
+	String sayHello(@RequestParam(defaultValue="Red Hat") String name) {
 		return String.format("{\"greeting\":\"Hello %s\"}", name);
 	}
 
