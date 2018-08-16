@@ -14,7 +14,8 @@ public class GrettingController {
 				+ "1. Source change works <br> "
 				+ "2. Pipeline setup done <br> "
 				+ "3. Disable triggers for bc and dc <br>"
-				+ "    3.1 Build runs but changes are not deployed (Doubt) ??? ";
+				+ "&nbsp;&nbsp;&nbsp;3.1 Build runs but changes are not deployed (Doubt) ??? "
+				+ "4. Pipeline configured - Lets check it";
 	}
 	
 	@RequestMapping(value="/hello", method=RequestMethod.GET)
