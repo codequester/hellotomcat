@@ -10,12 +10,16 @@ public class GrettingController {
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	String loadInitGreeting() {
-		return "This is test Application for Openshift-pipeline\n<br> 1. Source change works \n<br> 2. Pipeline setup done <br> 3. Disable triggers for bc and dc";
+		return "This is test Application for Openshift-pipeline <br> "
+				+ "1. Source change works <br> "
+				+ "2. Pipeline setup done <br> "
+				+ "3. Disable triggers for bc and dc <br>"
+				+ "    3.1 Build runs but changes are not deployed (Doubt) ??? ";
 	}
 	
 	@RequestMapping(value="/hello", method=RequestMethod.GET)
 	String sayHello(@RequestParam(defaultValue="Red Hat!!!") String name) {
-		return String.format("{\"greeting\":\"Hey %s\"}", name);
+		return String.format("{\"greeting\":\"Good Morning %s\"}", name);
 	}
 
 }
