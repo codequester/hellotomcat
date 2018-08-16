@@ -10,7 +10,7 @@ public class GrettingController {
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	String loadInitGreeting() {
-		return "This is test Application for Openshift-pipeline\n<br> 1. Source change works \n<br> 2. Pipeline setup done";
+		return "This is test Application for Openshift-pipeline\n<br> 1. Source change works \n<br> 2. Pipeline setup done \n 3. Disable triggers for bc and dc";
 	}
 	
 	@RequestMapping(value="/hello", method=RequestMethod.GET)
