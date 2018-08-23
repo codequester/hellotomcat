@@ -1,0 +1,22 @@
+apiVersion: "v1"
+kind: "BuildConfig"
+metadata:
+  labels:
+    application: hellotomcats2i
+    name: hellotomcats2i-pipeline
+  name: hellotomcats2i-pipeline
+spec:
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+        node('maven') {
+          stage 'build'
+            openshiftBuild(buildConfig: 'hellotomcats2i', showBuildLogs: 'true')
+          stage 'deploy'
+            openshiftDeploy(deploymentConfig: 'hellotomcats2i')
+        }
+  triggers:
+  - github:
+      secret: mysecret101
+    type: GitHub

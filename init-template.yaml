@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: initial-template
+objects:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    labels:
+      app: hellotomcats2i
+    name: hellotomcats2i-configmap
+  data:
+    variable1: value1
+    variable2: value2
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: hellotomcats2i
+    name: hellotomcats2i
+  spec:
+    lookupPolicy:
+      local: false
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: hellotomcats2i
+    name: hellotomcats2i
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: hellotomcats2i:latest
+    resources: {}
+    runPolicy: Serial
+    source:
+      git:
+        uri: https://github.com/codequester/hellotomcat.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: redhat-openjdk18-openshift:1.2
+          namespace: openshift
+      type: Source
+    triggers:
+    - github:
+        secret: githubsecret123
+      type: GitHub
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    generation: 1
+    labels:
+      app: hellotomcats2i
+    name: hellotomcats2i
+  spec:
+    replicas: 1
+    selector:
+      app: hellotomcats2i
+      deploymentconfig: hellotomcats2i
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: hellotomcats2i
+          deploymentconfig: hellotomcats2i
+      spec:
+        containers:
+        - image: hellotomcats2i:latest
+          imagePullPolicy: Always
+          name: hellotomcats2i
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          env:
+          - name: ENV_VAR_1
+            valueFrom:
+              configMapKeyRef:
+                name: hellotomcats2i-configmap
+                key: variable1
+          - name: ENV_VAR_2
+            valueFrom:
+              configMapKeyRef:
+                name: hellotomcats2i-configmap
+                key: variable2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - hellotomcats2i
+        from:
+          kind: ImageStreamTag
+          name: hellotomcats2i:latest
+          namespace: ref-impl
+      type: ImageChange
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: hellotomcats2i
+    name: hellotomcats2i
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: hellotomcats2i
+      deploymentconfig: hellotomcats2i
+    type: ClusterIP
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: hellotomcats2i
+    name: hellotomcats2i-route
+  spec:
+    host: hellotomcats2i-ref-impl.apps.na39.openshift.opentlc.com
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: hellotomcats2i
