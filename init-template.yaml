@@ -98,6 +98,12 @@ objects:
               configMapKeyRef:
                 name: hellotomcats2i-configmap
                 key: variable2
+          - name: DB_URL
+            value: jdbc:mysql://mysql:3306/sales?useSSL=false
+          - name: DB_USER
+            value: user1
+          - name: DB_PWD
+            value: password123
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
