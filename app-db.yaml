@@ -24,6 +24,7 @@ objects:
   data:
     variable1: value1
     variable2: value2
+    catalinaOpts: "-Xms 512m -Xmx8192m -XX:MaxPermSize=256m"
     sample.xml: |-
       <?xml version="1.0"?>
       <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -148,6 +149,11 @@ objects:
               configMapKeyRef:
                 name: hellotomcats2i-configmap
                 key: variable2
+          - name: CATALINA_OPTS
+            valueFrom:
+              configMapKeyRef:
+                name: hellotomcats2i-configmap
+                key: catalinaOpts
           - name: DB_URL
             value: jdbc:mysql://${DATABASE_SERVICE_NAME}:3306/${MYSQL_DATABASE}?useSSL=false
           - name: DB_USER
