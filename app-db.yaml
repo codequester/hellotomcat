@@ -125,6 +125,11 @@ objects:
       spec:
         containers:
         - image: hellotomcats2i:latest
+          command:
+            - cp
+          args:
+            - /app.${ENV}.properties
+            - /etc/conf/appy.properties  
           imagePullPolicy: Always
           name: hellotomcats2i
           ports:
@@ -385,3 +390,8 @@ parameters:
   name: MYSQL_VERSION
   required: true
   value: "5.7"
+- description: Application environment (dev or test).
+  displayName: Application Environment
+  name: ENV
+  required: true
+  value: dev
