@@ -4,99 +4,6 @@ metadata:
   name: initial-template
 objects:
 - apiVersion: v1
-  kind: Secret
-  metadata:
-    name: test-secret
-  data:
-    username: dGVzdHVzZXIK
-    password: dGVzdHB3ZDEyMwo=
-  stringData:
-    hostname: myapp.mydomain.com
-    secret.properties: |-
-      property1=valueA
-      property2=valueB
-- apiVersion: v1
-  kind: ConfigMap
-  metadata:
-    labels:
-      app: hellotomcats2i
-    name: hellotomcats2i-configmap
-  data:
-    variable1: value1
-    variable2: value2
-    catalinaOpts: "-Xms 512m -Xmx8192m -XX:MaxPermSize=256m"
-    sample.xml: |-
-      <?xml version="1.0"?>
-      <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-      <configuration>
-        <property>
-          <name>hbase.zookeeper.quorum</name>
-          <value>example1,example2,example3</value>
-          <description>The directory shared by RegionServers.
-          </description>
-        </property>
-        <property>
-          <name>hbase.zookeeper.property.dataDir</name>
-          <value>/export/zookeeper</value>
-          <description>Property from ZooKeeper's config zoo.cfg.
-          The directory where the snapshot is stored.
-          </description>
-        </property>
-        <property>
-          <name>hbase.rootdir</name>
-          <value>hdfs://example0:8020/hbase</value>
-          <description>The directory shared by RegionServers.</description>
-        </property>
-        <property>
-          <name>hbase.cluster.distributed</name>
-          <value>true</value>
-          <description>The mode the cluster will be in. Possible values are
-            false - tandalone and pseudo-distributed setups with managed Zookeeper
-            true - fully-distributed with unmanaged Zookeeper Quorum (see hbase-env.sh)
-          </description>
-        </property>
-      </configuration>
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    labels:
-      app: hellotomcats2i
-    name: hellotomcats2i
-  spec:
-    lookupPolicy:
-      local: false
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    labels:
-      app: hellotomcats2i
-    name: hellotomcats2i
-  spec:
-    output:
-      to:
-        kind: ImageStreamTag
-        name: hellotomcats2i:latest
-    resources: {}
-    runPolicy: Serial
-    source:
-      git:
-        uri: https://github.com/codequester/hellotomcat.git
-      type: Git
-    strategy:
-      sourceStrategy:
-        from:
-          kind: ImageStreamTag
-          name: redhat-openjdk18-openshift:1.2
-          namespace: openshift
-      type: Source
-    triggers:
-    - github:
-        secret: githubsecret123
-      type: GitHub
-    - type: ConfigChange
-    - imageChange: {}
-      type: ImageChange
-- apiVersion: v1
   kind: DeploymentConfig
   metadata:
     generation: 1
@@ -124,66 +31,32 @@ objects:
           deploymentconfig: hellotomcats2i
       spec:
         containers:
-        - image: hellotomcats2i:latest
+        - image: shankar29/hellotomcat:latest
+          #command: [/opt/app-root/src/init.sh]
+          #args:
+          #  - /opt/app-root/src/app.${ENV}.properties
+          #  - /var/tmp/appy.properties  
           imagePullPolicy: Always
           name: hellotomcats2i
           ports:
           - containerPort: 8080
             protocol: TCP
           resources: {}
-          volumeMounts:
-          # name must match the volume name below
-            - name: secret-volume
-              mountPath: /etc/secret-volume
-              readOnly: true
-            - name: xml-config
-              mountPath: /etc/conf
           env:
-          - name: ENV_VAR_1
-            valueFrom:
-              configMapKeyRef:
-                name: hellotomcats2i-configmap
-                key: variable1
-          - name: ENV_VAR_2
-            valueFrom:
-              configMapKeyRef:
-                name: hellotomcats2i-configmap
-                key: variable2
-          - name: CATALINA_OPTS
-            valueFrom:
-              configMapKeyRef:
-                name: hellotomcats2i-configmap
-                key: catalinaOpts
+          - name: ENV
+            value: ${ENV}
           - name: DB_URL
             value: jdbc:mysql://${DATABASE_SERVICE_NAME}:3306/${MYSQL_DATABASE}?useSSL=false
           - name: DB_USER
             value: ${MYSQL_USER}
           - name: DB_PWD
             value: ${MYSQL_PASSWORD}
-        volumes:
-          - name: secret-volume
-            secret:
-              secretName: test-secret
-          - name: xml-config
-            configMap: 
-              name: hellotomcats2i-configmap
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
         terminationGracePeriodSeconds: 30
     test: false
-    triggers:
-    - type: ConfigChange
-    - imageChangeParams:
-        automatic: true
-        containerNames:
-        - hellotomcats2i
-        from:
-          kind: ImageStreamTag
-          name: hellotomcats2i:latest
-          namespace: ref-impl
-      type: ImageChange
 - apiVersion: v1
   kind: Service
   metadata:
