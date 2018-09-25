@@ -23,7 +23,8 @@ public class Application { //extends SpringBootServletInitializer{
     @Bean
     public Executor getAsyncExecutor() {
     	ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
+    	int cpus = Runtime.getRuntime().availableProcessors();
+        executor.setCorePoolSize(cpus * 2);
         executor.setMaxPoolSize(20);
         executor.setQueueCapacity(500);
         executor.setThreadNamePrefix("ValidationEngineAggregator-");
