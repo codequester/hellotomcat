@@ -1,5 +1,8 @@
 package com.sample.hellotomcat;
 
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,9 +33,18 @@ public class GrettingController {
 	}
 	
 	
+	@RequestMapping(value="/callasync/return", method=RequestMethod.GET)
+	String callAsyncWreturn() throws InterruptedException, ExecutionException  {
+		Future<String> future = greetingService.someLongRunningMethodWReturn();
+		if(future.isDone()) 
+			return String.format("Result From Async Method -" + future.get());
+		else
+			return "Waiting";
+	}
+	
 	@RequestMapping(value="/callasync", method=RequestMethod.GET)
-	String callAsync() throws InterruptedException  {
+	String callAsync() throws InterruptedException, ExecutionException  {
 		greetingService.someLongRunningMethod();
-		return String.format("Method Running");
+		return "Api called and Done";
 	}
 }
