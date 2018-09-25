@@ -130,7 +130,13 @@ objects:
           ports:
           - containerPort: 8080
             protocol: TCP
-          resources: {}
+          resources:
+            requests:
+              cpu: 100m 
+              memory: 1Gi 
+            limits:
+              cpu: 200m 
+              memory: 2Gi 
           volumeMounts:
           # name must match the volume name below
             - name: secret-volume

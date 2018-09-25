@@ -19,6 +19,9 @@ public class GrettingController {
 	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	String loadInitGreeting() {
+		for(long i=0; i <= 1000000; i++) {
+			System.out.println("This is a sample");
+		}
 		return "This is test Application (NEW) for Openshift-pipeline <br> ";
 //				+ "1. Source change works <br> "
 //				+ "2. Pipeline setup done <br> "
