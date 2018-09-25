@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GrettingController {
 	
+	private GreetingService greetingService;
+	
+	public GrettingController(GreetingService greetingService) {
+		this.greetingService = greetingService;
+	}
+	
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	String loadInitGreeting() {
 		return "This is test Application (NEW) for Openshift-pipeline <br> ";
@@ -22,5 +28,11 @@ public class GrettingController {
 	String sayHello(@RequestParam(defaultValue="Red Hat!!!") String name) {
 		return String.format("{\"greeting\":\"Good Morning %s\"}", name);
 	}
-
+	
+	
+	@RequestMapping(value="/callasync", method=RequestMethod.GET)
+	String callAsync() throws InterruptedException  {
+		greetingService.someLongRunningMethod();
+		return String.format("Method Running");
+	}
 }
