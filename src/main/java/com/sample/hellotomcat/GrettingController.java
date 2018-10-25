@@ -3,6 +3,7 @@ package com.sample.hellotomcat;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class GrettingController {
+
+	@Autowired
+	private CustomHealthIndicator customHealthIndicator;
 	
 	private GreetingService greetingService;
 	private Boolean isRunning = true;
@@ -61,6 +65,7 @@ public class GrettingController {
 
 	private void registerShutDownHook(Thread controlThread) {
 		Thread monitorThread = new Thread(() -> {
+			customHealthIndicator.setIsShutDownTriggered(true);
 			System.out.println("Shutdown Sequence INITIATED -->");
 			isRunning = false;
 			controlThread.interrupt();
