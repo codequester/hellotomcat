@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GrettingController {
 	
 	private GreetingService greetingService;
+	private Boolean isRunning = true;
 	
 	public GrettingController(GreetingService greetingService) {
 		this.greetingService = greetingService;
@@ -49,5 +50,29 @@ public class GrettingController {
 	String callAsync() throws InterruptedException, ExecutionException  {
 		greetingService.someLongRunningMethod();
 		return "Api called and Done";
+	}
+
+	@RequestMapping(value="/grace", method=RequestMethod.GET)
+	String testGraceness() throws InterruptedException {
+		registerShutDownHook(Thread.currentThread());
+		keepCurrentThreadBusy();
+		return "Thread Running in the backggroun... Check the console";
+	}
+
+	private void registerShutDownHook(Thread controlThread) {
+		Thread monitorThread = new Thread(() -> {
+			System.out.println("Shutdown Sequence INITIATED -->");
+			isRunning = false;
+			controlThread.interrupt();
+			System.out.println("Controll Thread Stopped before program exit. . .");
+		});
+		Runtime.getRuntime().addShutdownHook(monitorThread);
+	}
+
+	private void keepCurrentThreadBusy() throws InterruptedException {
+		while(isRunning) {
+			Thread.sleep(1000);
+			System.out.println("Control Thread Running. . .");
+		}
 	}
 }

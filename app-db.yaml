@@ -127,6 +127,12 @@ objects:
         - image: hellotomcats2i:latest
           imagePullPolicy: Always
           name: hellotomcats2i
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 3
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -303,7 +309,7 @@ objects:
                 key: database-name
                 name: ${DATABASE_SERVICE_NAME}
           image: ' '
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: IfNotPresent        
           livenessProbe:
             initialDelaySeconds: 30
             tcpSocket:
