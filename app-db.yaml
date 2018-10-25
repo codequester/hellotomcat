@@ -133,6 +133,10 @@ objects:
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep","300"]
           ports:
           - containerPort: 8080
             protocol: TCP
