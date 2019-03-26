@@ -86,7 +86,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: redhat-openjdk18-openshift:1.2
+          name: redhat-openjdk18-openshift:1.5 #1.2 #registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5
           namespace: openshift
       type: Source
     triggers:
@@ -114,7 +114,7 @@ objects:
         intervalSeconds: 1
         maxSurge: 25%
         maxUnavailable: 25%
-        timeoutSeconds: 600
+        timeoutSeconds: 1600
         updatePeriodSeconds: 1
       type: Rolling
     template:
@@ -127,25 +127,30 @@ objects:
         - image: hellotomcats2i:latest
           imagePullPolicy: Always
           name: hellotomcats2i
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 3
+#          readinessProbe:
+#            httpGet:
+#              path: /actuator/health
+#              port: 8080
+#            exec:
+#              command: 
+#              - "/bin/bash"
+#              - "-c"
+#              - if [ ! -f /tmp/pod_shutdown.started ]; then echo ">>>> GOOOOOOD"; exit 0; else echo ">>>>>>> BAAAAAAD"; exit 1; fi
+#            initialDelaySeconds: 30
+#            periodSeconds: 3
           lifecycle:
             preStop:
               exec:
-                command: ["sleep","300"]
+                command: ["/bin/touch", "/tmp/pod_shutdown.started", ";", "sleep", "300"]
           ports:
           - containerPort: 8080
             protocol: TCP
           resources:
             requests:
-              cpu: 100m 
+              cpu: 100n
               memory: 1Gi 
             limits:
-              cpu: 200m 
+              cpu: 200m
               memory: 2Gi 
           volumeMounts:
           # name must match the volume name below
@@ -198,7 +203,6 @@ objects:
         from:
           kind: ImageStreamTag
           name: hellotomcats2i:latest
-          namespace: ref-impl
       type: ImageChange
 - apiVersion: v1
   kind: Service
@@ -223,7 +227,7 @@ objects:
       app: hellotomcats2i
     name: hellotomcats2i-route
   spec:
-    host: hellotomcats2i-ref-impl.apps.na39.openshift.opentlc.com
+    #host: hellotomcats2i-ref-impl.apps.na39.openshift.opentlc.com
     port:
       targetPort: 8080-tcp
     to:
@@ -350,7 +354,7 @@ objects:
         from:
           kind: ImageStreamTag
           name: mysql:${MYSQL_VERSION}
-          namespace: ${NAMESPACE}
+          namespace: openshift
       type: ImageChange
     - type: ConfigChange
 parameters:
